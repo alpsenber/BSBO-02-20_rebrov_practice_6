@@ -90,25 +90,25 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
+    protected void onActivityResult(int requestCode, int resultCode,    Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 101 && resultCode == RESULT_OK && null != data)
         {
             Uri selectedImage = data.getData();
-            String[] filePathColumn = { MediaStore.Images.Media.DATA };
-            Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-            cursor.moveToFirst();
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
-            Bitmap bitmap = BitmapFactory.decodeFile(picturePath);
-            binding.imageView.setImageBitmap(bitmap);
+            binding.imageView.setImageURI(selectedImage);
+            Bitmap bitmap;
+            try
+            {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
+            }
+            catch (IOException e)
+            {
+                throw new RuntimeException(e);
+            }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-            byte[] photos = baos.toByteArray();
-            cypherPhoto = Base64.encodeToString(photos, Base64.DEFAULT);
+            byte[] b = baos.toByteArray();
+            cypherPhoto = Base64.encodeToString(b, Base64.DEFAULT);
         }
     }
-
 }
